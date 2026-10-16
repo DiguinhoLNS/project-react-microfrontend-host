@@ -30,6 +30,35 @@ Abra http://localhost:3000.
 | `yarn lint` | ESLint |
 | `yarn typecheck` | Gera os tipos de rota e roda o `tsc` |
 
+## Estrutura
+
+Rotas finas em `app/` (só definem `metadata` e renderizam a página do módulo) e a lógica em `modules/`.
+
+```
+src/
+├── app/
+│   ├── layout.tsx           # html, fontes, ThemeProvider e providers globais
+│   ├── not-found.tsx        # 404 -> modules/error
+│   └── (app)/               # rotas com o layout de Sidebar + Header
+│       └── page.tsx         # /  -> modules/home
+├── components/
+│   ├── app/                 # providers (ClientProvider)
+│   ├── common/              # componentes reutilizáveis (ThemeToggle)
+│   ├── layout/App           # SidebarProvider + Sidebar + Header + main
+│   ├── page/                # partes de página (Sidebar, Header, PageHeader)
+│   └── ui/                  # componentes do shadcn (gerados pela CLI)
+├── hooks/                   # useMobile
+├── lib/                     # `cn` do shadcn
+├── modules/                 # domínios (pages, components, constants, interfaces...)
+│   ├── error/
+│   └── home/
+└── utils/
+```
+
+O layout usa o `Sidebar` do shadcn: recolhível em modo ícone no desktop (`Ctrl+B`) e em `Sheet` no mobile.
+Para adicionar um item no menu, edite [`components/page/Sidebar/constants/links.ts`](src/components/page/Sidebar/constants/links.ts);
+o breadcrumb do Header usa a mesma lista.
+
 ## Tema claro / escuro
 
 - O `ThemeProvider` de `@wrksz/themes/next` fica em [`src/app/layout.tsx`](src/app/layout.tsx), com `defaultTheme='system'`.
@@ -44,6 +73,9 @@ npx shadcn@latest add <componente>
 ```
 
 Os arquivos são criados em `src/components/ui` (configuração em [`components.json`](components.json)).
+
+> **Atenção:** o [`sidebar.tsx`](src/components/ui/sidebar.tsx) importa `useIsMobile` de `@/hooks/useMobile`
+> (a CLI gera `@/hooks/use-mobile`). Se rodar `add sidebar --overwrite`, refaça o ajuste e apague o `use-mobile.ts` gerado.
 
 ## Commits
 
