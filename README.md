@@ -47,17 +47,55 @@ src/
 │   ├── layout/App           # SidebarProvider + Sidebar + Header + main
 │   ├── page/                # partes de página (Sidebar, Header, PageHeader)
 │   └── ui/                  # componentes do shadcn (gerados pela CLI)
+├── env/                     # variáveis de ambiente tipadas
 ├── hooks/                   # useMobile
 ├── lib/                     # `cn` do shadcn
 ├── modules/                 # domínios (pages, components, constants, interfaces...)
 │   ├── error/
-│   └── home/
+│   ├── home/
+│   └── microfrontends/      # infraestrutura genérica de MFE
+│       ├── constants/       # contract.ts (versão) e remotes.ts (registro)
+│       ├── interfaces/      # IRemoteContract (espelho do contrato do remote), IRemoteConfig
+│       └── services/        # remoteLoaderService.ts
 └── utils/
 ```
 
 O layout usa o `Sidebar` do shadcn: recolhível em modo ícone no desktop (`Ctrl+B`) e em `Sheet` no mobile.
 Para adicionar um item no menu, edite [`components/page/Sidebar/constants/links.ts`](src/components/page/Sidebar/constants/links.ts);
 o breadcrumb do Header usa a mesma lista.
+
+## Variáveis de ambiente
+
+Copie o `.env.example` para `.env.local` se precisar mudar algum valor. O `.env*` não é versionado.
+
+| Variável | Descrição | Padrão |
+| --- | --- | --- |
+| `NEXT_PUBLIC_REMOTE_PRODUCTS_URL` | URL absoluta do `remote-entry.js` do remote de produtos. | `http://localhost:4173/remote-entry.js` |
+
+Variáveis `NEXT_PUBLIC_*` entram no bundle no `next build`: ao mudar a URL, faça um novo build/deploy.
+
+## Contrato host ⇄ remote
+
+O host não sabe qual framework o remote usa. Ele só conhece o módulo ESM `remote-entry.js`:
+
+```ts
+export const contractVersion = 1
+export function mount(element: HTMLElement, props?: IRemoteProps): {
+    update(props: Partial<IRemoteProps>): void
+    unmount(): void
+}
+```
+
+- **host → remote**: `hostName`, `theme`, `user` (mudanças viram `update`)
+- **remote → host**: `onEvent(event)` com eventos tipados (`products:loaded`, `product:created`, ...)
+- Mudança incompatível = incrementar `CONTRACT_VERSION` nos dois repos. O host recusa versões diferentes.
+
+O tipo fica em [`modules/microfrontends/interfaces/IRemoteContract.d.ts`](src/modules/microfrontends/interfaces/IRemoteContract.d.ts)
+e é espelhado no remote. Quando houver mais remotes, vale extrair para um pacote npm compartilhado.
+
+O [`RemoteLoaderService`](src/modules/microfrontends/services/remoteLoaderService.ts) faz o `import()` em runtime
+(fora do bundle do Next, via `webpackIgnore`), valida `mount` e `contractVersion` e guarda o módulo em cache por URL.
+Como o navegador memoriza a falha de um `import()`, cada nova tentativa usa `?retry=<n>`.
 
 ## Tema claro / escuro
 
