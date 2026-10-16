@@ -1,5 +1,8 @@
 import clsx from 'clsx'
+import Link from 'next/link'
+import { ArrowRight } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import PageHeader from '@/components/page/PageHeader'
 import { architectureCards, architectureFlow } from '../../constants/architecture'
@@ -12,7 +15,14 @@ export default function Home() {
             <PageHeader
                 title='Microfrontends'
                 description='Host em Next.js que carrega microfrontends React em runtime, cada um com deploy próprio.'
-            />
+            >
+                <Button asChild>
+                    <Link href='/produtos'>
+                        Abrir remote de produtos
+                        <ArrowRight />
+                    </Link>
+                </Button>
+            </PageHeader>
 
             <div className={clsx('grid gap-4 md:grid-cols-2')}>
                 {architectureCards.map(item => (

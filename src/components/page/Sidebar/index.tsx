@@ -15,10 +15,17 @@ import {
     SidebarMenuItem,
     SidebarRail
 } from '@/components/ui/sidebar'
+import useRemoteEventsStore from '@/modules/microfrontends/store/remoteEventsStore'
 import sidebarLinks from './constants/links'
 import SidebarLinkItem from './components/MenuItem'
 
 export default function Sidebar() {
+
+    const productsCount = useRemoteEventsStore(state => state.productsCount)
+
+    const badges: Record<string, number | null> = {
+        '/produtos': productsCount
+    }
 
     return (
 
@@ -60,6 +67,7 @@ export default function Sidebar() {
                                     <SidebarLinkItem
                                         key={item.link}
                                         {...item}
+                                        badge={badges[item.link]}
                                     />
                                 ))}
                             </SidebarMenu>

@@ -2,11 +2,15 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar'
+import { SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar'
 import isActiveLink from '@/utils/isActiveLink'
 import type { ISidebarLink } from '../../interfaces/ISidebarLink'
 
-export default function SidebarLinkItem({ link, icon: Icon, label }: ISidebarLink) {
+interface SidebarLinkItemProps extends ISidebarLink {
+    badge?: number | null
+}
+
+export default function SidebarLinkItem({ link, icon: Icon, label, badge }: SidebarLinkItemProps) {
 
     const pathName = usePathname()
     const { isMobile, setOpenMobile } = useSidebar()
@@ -30,6 +34,10 @@ export default function SidebarLinkItem({ link, icon: Icon, label }: ISidebarLin
                         <span>{label}</span>
                     </Link>
                 </SidebarMenuButton>
+
+                {typeof badge === 'number' && (
+                    <SidebarMenuBadge>{badge}</SidebarMenuBadge>
+                )}
             </SidebarMenuItem>
         </>
 
