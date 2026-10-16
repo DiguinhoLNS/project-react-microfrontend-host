@@ -1,15 +1,20 @@
-import type { Metadata } from 'next'
+import clsx from 'clsx'
 import { Geist, Geist_Mono } from 'next/font/google'
+import { ThemeProvider } from '@wrksz/themes/next'
+import type { Metadata } from 'next'
+import AppClientProvider from '@/components/app/ClientProvider'
 import './globals.css'
 
-const geistSans = Geist({
-    variable: '--font-geist-sans',
-    subsets: ['latin']
+const geist = Geist({
+    subsets: ['latin'],
+    variable: '--font-sans',
+    display: 'swap'
 })
 
 const geistMono = Geist_Mono({
-    variable: '--font-geist-mono',
-    subsets: ['latin']
+    subsets: ['latin'],
+    variable: '--font-mono',
+    display: 'swap'
 })
 
 export const metadata: Metadata = {
@@ -25,10 +30,18 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
     return (
         <html
             lang='pt-BR'
-            className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+            className={clsx('h-svh antialiased font-sans', geist.variable, geistMono.variable)}
+            suppressHydrationWarning
         >
-            <body className='flex flex-col min-h-full'>
-                {children}
+            <body className={clsx('flex flex-1 flex-col w-full h-full')}>
+                <ThemeProvider
+                    defaultTheme='system'
+                    disableTransitionOnChange
+                >
+                    <AppClientProvider>
+                        {children}
+                    </AppClientProvider>
+                </ThemeProvider>
             </body>
         </html>
     )
